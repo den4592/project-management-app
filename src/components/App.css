@@ -11,6 +11,10 @@
   margin: 0 auto;
 }
 
+body {
+  background-color: #faf8ff;
+}
+
 header {
   width: 100%;
   padding: 0 1rem;
@@ -46,10 +50,6 @@ input[type="text"] {
   margin-top: 3rem;
 }
 
-.task-list-title {
-  text-align: center;
-}
-
 .task {
   margin-top: 2rem;
   border: 1px solid black;
@@ -64,7 +64,23 @@ input[type="text"] {
   color: red;
 }
 
-.remove-btn:hover {
+.icon-btn:hover {
   cursor: pointer;
   opacity: 0.5;
+}
+
+.edit-btn {
+  color: blue;
+}
+
+.icon-btn + .icon-btn {
+  margin-left: 1rem;
+}
+
+.task-container {
+  display: flex;
+}
+
+.add-task-btn {
+  margin-left: 1rem;
 }

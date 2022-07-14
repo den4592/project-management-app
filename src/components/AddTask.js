@@ -1,50 +1,91 @@
 import { useState, useEffect } from "react";
 import { TaskList } from "./TaskList";
 import { v4 as uuidv4 } from "uuid";
+import api from "./api/tasks";
+import Modal from "react-modal";
+
+const customStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
 
 export const AddTask = () => {
-  const [text, setText] = useState("");
+  const [taskText, setTaskText] = useState("");
   const [tasks, setTasks] = useState([]);
+  const [modalIsOpen, setIsOpen] = useState(false);
 
-  const handleSubmit = (e) => {
+  function openAddModal() {
+    setIsOpen(true);
+  }
+
+  function afterOpenModal() {
+    // references are now sync'd and can be accessed.
+  }
+
+  function closeAddModal() {
+    setIsOpen(false);
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const task = {
       id: uuidv4(),
       checked: false,
-      text: text,
+      text: taskText,
     };
-    setTasks([task, ...tasks]);
-    setText("");
+    const response = await api.post("/tasks", task);
+    setTasks([...tasks, response.data]);
+    setTaskText("");
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
+    await api.delete(`/tasks/${id}`);
     const removedTasks = tasks.filter((item) => item.id !== id);
     setTasks(removedTasks);
   };
 
-  useEffect(() => {
-    let data = JSON.parse(localStorage.getItem("tasks"));
-    data.forEach((item) => {
-      setTasks(data);
-    });
-  }, []);
+  const retriveTasks = async () => {
+    const response = await api.get("/tasks");
+    return response.data;
+  };
 
   useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  }, [tasks]);
+    const getAllTasks = async () => {
+      const allTasks = await retriveTasks();
+      if (allTasks) setTasks(allTasks);
+    };
+
+    getAllTasks();
+  }, []);
 
   return (
     <div className="add-task">
       <div className="container">
-        <form onSubmit={handleSubmit}>
-          <label>Task:</label>
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <button>Add Task</button>
-        </form>
+        <button onClick={openAddModal}>Add Task</button>
+        <Modal
+          isOpen={modalIsOpen}
+          onAfterOpen={afterOpenModal}
+          onRequestClose={closeAddModal}
+          style={customStyles}
+          contentLabel="Example Modal"
+        >
+          <button onClick={closeAddModal}>close</button>
+          <form onSubmit={handleSubmit}>
+            <label>Task:</label>
+            <input
+              type="text"
+              value={taskText}
+              onChange={(e) => setTaskText(e.target.value)}
+            />
+            <button>Add</button>
+          </form>
+        </Modal>
       </div>
       <TaskList tasks={tasks} handleDelete={handleDelete} />
     </div>

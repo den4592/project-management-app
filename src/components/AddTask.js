@@ -5,13 +5,25 @@ import api from "./api/tasks";
 import Modal from "react-modal";
 
 const customStyles = {
+  overlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(123, 123, 123, 0.75)",
+  },
   content: {
+    position: "absolute",
     top: "50%",
     left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
+
+    minWidth: "20rem",
+    height: "10rem",
+    padding: "2rem",
+    overflow: "visible",
     transform: "translate(-50%, -50%)",
+    backgroundColor: "#EFEFF8",
   },
 };
 
@@ -24,9 +36,7 @@ export const AddTask = () => {
     setIsOpen(true);
   }
 
-  function afterOpenModal() {
-    // references are now sync'd and can be accessed.
-  }
+  function afterOpenModal() {}
 
   function closeAddModal() {
     setIsOpen(false);
@@ -75,7 +85,9 @@ export const AddTask = () => {
           style={customStyles}
           contentLabel="Example Modal"
         >
-          <button onClick={closeAddModal}>close</button>
+          <button onClick={closeAddModal} className="close-btn">
+            close
+          </button>
           <form onSubmit={handleSubmit}>
             <label>Task:</label>
             <input
@@ -83,7 +95,7 @@ export const AddTask = () => {
               value={taskText}
               onChange={(e) => setTaskText(e.target.value)}
             />
-            <button>Add</button>
+            <button className="add-btn">Add</button>
           </form>
         </Modal>
       </div>

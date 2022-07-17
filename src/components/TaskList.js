@@ -3,6 +3,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import Modal from "react-modal";
 import { useState } from "react";
+
 const customStyles = {
   overlay: {
     position: "fixed",
@@ -13,10 +14,10 @@ const customStyles = {
     backgroundColor: "rgba(123, 123, 123, 0.75)",
   },
   content: {
-    position: "absolute",
     top: "50%",
     left: "50%",
-
+    display: "flex",
+    maxWidth: "20rem",
     minWidth: "20rem",
     height: "10rem",
     padding: "2rem",
@@ -26,8 +27,9 @@ const customStyles = {
   },
 };
 
-export const TaskList = ({ tasks, handleDelete }) => {
+export const TaskList = ({ tasks, handleDelete, handleEdit }) => {
   const [taskText, setTaskText] = useState("");
+  const [task, setTask] = useState(null);
   const [modalIsOpen, setIsOpen] = useState(false);
 
   function openUpdateModal() {
@@ -40,10 +42,6 @@ export const TaskList = ({ tasks, handleDelete }) => {
     setIsOpen(false);
   }
 
-  const handleEdit = (id, txt) => {
-    setTaskText(txt);
-  };
-
   const td = tasks.map((task) => {
     return (
       <div key={task.id} className="task">
@@ -53,7 +51,7 @@ export const TaskList = ({ tasks, handleDelete }) => {
           <FontAwesomeIcon
             className="edit-btn icon-btn"
             onClick={() => {
-              handleEdit(task.id, task.text);
+              setTask(task);
               openUpdateModal();
             }}
             icon={faPenToSquare}
@@ -77,9 +75,6 @@ export const TaskList = ({ tasks, handleDelete }) => {
         style={customStyles}
         contentLabel="Example Modal"
       >
-        <button onClick={closeUpdateModal} className="close-btn">
-          close
-        </button>
         <form>
           <label>Task:</label>
           <input
@@ -87,7 +82,27 @@ export const TaskList = ({ tasks, handleDelete }) => {
             value={taskText}
             onChange={(e) => setTaskText(e.target.value)}
           />
-          <button className="update-btn">Update</button>
+          <div className="modal-btn-container">
+            <button
+              className="add-btn btn"
+              onClick={(e) => {
+                handleEdit(e, task, taskText);
+                closeUpdateModal();
+              }}
+            >
+              Update
+            </button>
+            <button
+              onClick={() => {
+                setTask(null);
+                setTaskText("");
+                closeUpdateModal();
+              }}
+              className="close-btn btn"
+            >
+              Close
+            </button>
+          </div>
         </form>
       </Modal>
       <div className="container">

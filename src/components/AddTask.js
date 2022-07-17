@@ -14,10 +14,10 @@ const customStyles = {
     backgroundColor: "rgba(123, 123, 123, 0.75)",
   },
   content: {
-    position: "absolute",
     top: "50%",
     left: "50%",
-
+    display: "flex",
+    maxWidth: "20rem",
     minWidth: "20rem",
     height: "10rem",
     padding: "2rem",
@@ -65,6 +65,18 @@ export const AddTask = () => {
     return response.data;
   };
 
+  const handleEdit = async (e, task, txt) => {
+    e.preventDefault();
+    task.text = txt;
+    const response = await api.put(`/tasks/${task.id}`, task);
+    const { id } = response.data;
+    setTasks(
+      tasks.map((task) => {
+        return task.id === id ? { ...response.data } : task;
+      })
+    );
+  };
+
   useEffect(() => {
     const getAllTasks = async () => {
       const allTasks = await retriveTasks();
@@ -77,7 +89,10 @@ export const AddTask = () => {
   return (
     <div className="add-task">
       <div className="container">
-        <button onClick={openAddModal}>Add Task</button>
+        <button onClick={openAddModal} className="add-btn btn">
+          Add Task
+        </button>
+
         <Modal
           isOpen={modalIsOpen}
           onAfterOpen={afterOpenModal}
@@ -85,9 +100,6 @@ export const AddTask = () => {
           style={customStyles}
           contentLabel="Example Modal"
         >
-          <button onClick={closeAddModal} className="close-btn">
-            close
-          </button>
           <form onSubmit={handleSubmit}>
             <label>Task:</label>
             <input
@@ -95,11 +107,20 @@ export const AddTask = () => {
               value={taskText}
               onChange={(e) => setTaskText(e.target.value)}
             />
-            <button className="add-btn">Add</button>
+            <div className="modal-btn-container">
+              <button className="add-btn btn">Add</button>
+              <button onClick={closeAddModal} className="close-btn btn">
+                Close
+              </button>
+            </div>
           </form>
         </Modal>
       </div>
-      <TaskList tasks={tasks} handleDelete={handleDelete} />
+      <TaskList
+        tasks={tasks}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 };

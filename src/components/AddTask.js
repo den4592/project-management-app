@@ -55,7 +55,7 @@ export const AddTask = () => {
   };
 
   const handleDelete = async (id) => {
-    await api.delete(`/tasks/${id}`);
+    await api.delete(`/${id}`);
     const removedTasks = tasks.filter((item) => item.id !== id);
     setTasks(removedTasks);
   };

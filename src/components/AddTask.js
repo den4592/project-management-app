@@ -3,6 +3,7 @@ import { TaskList } from "./TaskList";
 import { v4 as uuidv4 } from "uuid";
 import api from "./api/tasks";
 import Modal from "react-modal";
+import axios from "axios";
 
 const customStyles = {
   overlay: {
@@ -27,6 +28,8 @@ const customStyles = {
   },
 };
 
+const url = "https://myproject-management-app.herokuapp.com/tasks";
+
 export const AddTask = () => {
   const [taskText, setTaskText] = useState("");
   const [tasks, setTasks] = useState([]);
@@ -49,20 +52,37 @@ export const AddTask = () => {
       checked: false,
       text: taskText,
     };
-    const response = await api.post("/tasks", task);
-    setTasks([...tasks, response.data]);
+    axios
+      .post(url, task)
+      .then((resp) => {
+        console.log("post", resp.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    // const response = await api.post(url, task);
+    setTasks([...tasks, task]);
     setTaskText("");
   };
 
   const handleDelete = async (id) => {
-    await api.delete(`/${id}`);
+    await api.delete(`/tasks/${id}`);
     const removedTasks = tasks.filter((item) => item.id !== id);
     setTasks(removedTasks);
   };
 
   const retriveTasks = async () => {
-    const response = await api.get("/tasks");
-    return response.data;
+    axios
+      .get(url)
+      .then((resp) => {
+        let data = resp.data;
+        console.log(data);
+        setTasks(data);
+        console.log(tasks);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handleEdit = async (e, task, txt) => {
@@ -78,12 +98,7 @@ export const AddTask = () => {
   };
 
   useEffect(() => {
-    const getAllTasks = async () => {
-      const allTasks = await retriveTasks();
-      if (allTasks) setTasks(allTasks);
-    };
-
-    getAllTasks();
+    retriveTasks();
   }, []);
 
   return (
